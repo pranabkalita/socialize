@@ -1,50 +1,20 @@
+// Global Imports
 const express = require('express')
-const mongoose = require('mongoose')
-const { Schema } = mongoose
 
-mongoose
-  .connect('mongodb://localhost:27017/socialize', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log('Connected to Database. Hurray !')
-  })
-  .catch((error) => {
-    console.log(`Error connecting database: ${error}`)
-  })
+// Project Import
+const database = require('./config/database')
+const viewsRouter = require('./routes/Views')
 
-const postSchema = new Schema(
-  {
-    title: String,
-    slug: String,
-    body: String,
-    coverImage: String,
-    images: [String],
-    isDraft: { type: Boolean, default: false },
-    isPublished: { type: Boolean, default: true },
-  },
-  {
-    timestamps: true,
-  }
-)
+// Database connection
+database.connect()
 
-const Post = mongoose.model('Post', postSchema)
-
+// Fire up server
 const app = express()
 
-app.get('/', (req, res) => {
-  res.send('HOME PAGE !')
-})
+// Routes
+app.use('/', viewsRouter)
 
-app.get('/about', (req, res) => {
-  res.send('ABOUT PAGE !')
-})
-
-app.get('/contact', (req, res) => {
-  res.send('CONTACT PAGE !')
-})
-
+// Listen to Server
 app.listen(3000, () => {
   console.log(`Server running at PORT: 3000`)
 })
