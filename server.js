@@ -1,4 +1,17 @@
 const express = require('express')
+const mongoose = require('mongoose')
+
+mongoose
+  .connect('mongodb://localhost:27017/socialize', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to Database. Hurray !')
+  })
+  .catch((error) => {
+    console.log(`Error connecting database: ${error}`)
+  })
 
 const app = express()
 
