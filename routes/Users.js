@@ -8,7 +8,7 @@ const AuthValidators = require('../validators/AuthValidators')
 
 const router = express.Router()
 
-router.post('/login', UserController.login)
+router.post('/login', AuthValidators.login, UserController.login)
 router.post('/register', AuthValidators.register, UserController.register)
 router.post('/logout', UserController.logout)
 
