@@ -32,8 +32,8 @@ exports.login = async (req, res) => {
     }
 
     // 3. If everything is fine, Generate JWT
-    const token = jwt.sign({ id: user._id }, 'MY_SUPER_SECRET_TOKEN', {
-      expiresIn: '90d',
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: process.env.JWT_EXPIRES_AT,
     })
 
     // 4. Send Response
