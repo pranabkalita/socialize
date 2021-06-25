@@ -3,6 +3,26 @@ const jwt = require('jsonwebtoken')
 
 const User = require('./../models/User')
 
+exports.me = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate('posts')
+
+    res.status(200).json({
+      status: 'success',
+      data: { user },
+    })
+  } catch (error) {
+    console.warn('Error: ', error)
+
+    res.status(201).json({
+      status: 'fail',
+      data: {
+        message: 'Error creating post !',
+      },
+    })
+  }
+}
+
 exports.login = async (req, res) => {
   try {
     // 1. Check fir validation

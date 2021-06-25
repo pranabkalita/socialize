@@ -4,6 +4,7 @@ const { Schema } = mongoose
 
 const postSchema = new Schema(
   {
+    user: { type: Schema.ObjectId, ref: 'User', required: true },
     title: { type: String, unique: true },
     slug: { type: String, unique: true },
     body: String,

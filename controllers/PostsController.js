@@ -28,7 +28,7 @@ exports.getOne = async (req, res) => {
   try {
     const { slug } = req.params
 
-    const post = await Post.findOne({ slug })
+    const post = await Post.findOne({ slug }).populate('user')
 
     if (!post) {
       res.status(400).json({
@@ -39,6 +39,7 @@ exports.getOne = async (req, res) => {
       })
     }
 
+    post.user.password = undefined
     res.status(200).json({
       status: 'success',
       data: {
@@ -72,8 +73,8 @@ exports.create = async (req, res) => {
     }
 
     const { title, body } = req.body
-
-    const post = await Post.create({ title, body })
+    const { _id } = req.user
+    const post = await Post.create({ user: _id, title, body })
 
     res.status(201).json({
       status: 'success',
