@@ -6,12 +6,20 @@ const PostsController = require('./../controllers/PostsController')
 // Validators
 const PostValidators = require('./../validators/PostValidators')
 
+// Middlewares
+const AuthMiddleware = require('./../middlewares/AuthMiddleware')
+
 const router = express.Router()
 
 router.get('/', PostsController.getAll)
 router.get('/:slug', PostsController.getOne)
-router.post('/', PostValidators.create, PostsController.create)
-router.patch('/:slug', PostsController.updateOne)
-router.delete('/:slug', PostsController.delete)
+router.post(
+  '/',
+  AuthMiddleware.protect,
+  PostValidators.create,
+  PostsController.create
+)
+router.patch('/:slug', AuthMiddleware.protect, PostsController.updateOne)
+router.delete('/:slug', AuthMiddleware.protect, PostsController.delete)
 
 module.exports = router
