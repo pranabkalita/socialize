@@ -9,6 +9,7 @@ const database = require('./config/database')
 const viewsRouter = require('./routes/Views')
 const postsRouter = require('./routes/Posts')
 const usersRouter = require('./routes/Users')
+const tagsRouter = require('./routes/Tags')
 
 // Database connection
 database.connect()
@@ -21,6 +22,7 @@ app.use(express.json())
 app.use('/', viewsRouter)
 app.use('/api/posts', postsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/tags', tagsRouter)
 
 // Listen to Server
 const PORT = process.env.APP_PORT

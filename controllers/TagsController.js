@@ -1,30 +1,15 @@
 const validator = require('express-validator')
 
-const Post = require('./../models/Post')
 const Tag = require('./../models/Tag')
-
-const addTagToPost = async (postId, tag) =>
-  Post.findByIdAndUpdate(
-    postId,
-    { $push: { tags: tag } },
-    { new: true, useFindAndModify: false }
-  )
-
-const addPostToTag = async (tagId, post) =>
-  Tag.findByIdAndUpdate(
-    tagId,
-    { $push: { posts: post } },
-    { new: true, useFindAndModify: false }
-  )
 
 exports.getAll = async (req, res) => {
   try {
-    const posts = await Post.find({ isPublished: true }).sort('-createdAt')
+    const tags = await Tag.find().sort('-createdAt')
 
     res.status(200).json({
       status: 'success',
       data: {
-        posts,
+        tags,
       },
     })
   } catch (error) {
@@ -33,7 +18,7 @@ exports.getAll = async (req, res) => {
     res.status(201).json({
       status: 'fail',
       data: {
-        message: 'Error creating post !',
+        message: 'Error fetching tags !',
       },
     })
   }
@@ -43,22 +28,21 @@ exports.getOne = async (req, res) => {
   try {
     const { slug } = req.params
 
-    const post = await Post.findOne({ slug }).populate('user').populate('tags')
+    const tag = await Tag.findOne({ slug }).populate('posts')
 
-    if (!post) {
+    if (!tag) {
       res.status(400).json({
         status: 'fail',
         data: {
-          message: 'Post not found !',
+          message: 'Tag not found !',
         },
       })
     }
 
-    post.user.password = undefined
     res.status(200).json({
       status: 'success',
       data: {
-        post,
+        tag,
       },
     })
   } catch (error) {
@@ -67,7 +51,7 @@ exports.getOne = async (req, res) => {
     res.status(201).json({
       status: 'fail',
       data: {
-        message: 'Error creating post !',
+        message: 'Error fetching one tag !',
       },
     })
   }
@@ -81,31 +65,19 @@ exports.create = async (req, res) => {
       return res.status(400).json({
         status: 'fail',
         data: {
-          message: 'Post creation failed !',
+          message: 'Tag creation failed !',
           errors: errors.array(),
         },
       })
     }
 
-    const { title, body } = req.body
-    const { _id } = req.user
-
-    const post = await Post.create({ user: _id, title, body })
-
-    if (typeof req.body.tags !== 'undefined' && req.body.tags.length > 0) {
-      await Promise.all(
-        req.body.tags.map(async (tag) => addTagToPost(post.id, tag))
-      )
-
-      await Promise.all(
-        req.body.tags.map(async (tag) => addPostToTag(tag, post.id))
-      )
-    }
+    const { title } = req.body
+    const tag = await Tag.create({ title })
 
     res.status(201).json({
       status: 'success',
       data: {
-        post,
+        tag,
       },
     })
   } catch (error) {
@@ -114,7 +86,7 @@ exports.create = async (req, res) => {
     res.status(201).json({
       status: 'fail',
       data: {
-        message: 'Error creating post !',
+        message: 'Error creating tag !',
       },
     })
   }
@@ -124,25 +96,24 @@ exports.updateOne = async (req, res) => {
   try {
     const { slug } = req.params
 
-    const post = await Post.findOne({ slug })
+    const tag = await Tag.findOne({ slug })
 
-    if (!post) {
+    if (!tag) {
       res.status(400).json({
         status: 'fail',
         data: {
-          message: 'Post not found !',
+          message: 'Tag not found !',
         },
       })
     }
 
-    post.title = req.body.title
-    post.body = req.body.body
-    await post.save({ validateBeforeSave: false })
+    tag.title = req.body.title
+    await tag.save({ validateBeforeSave: false })
 
     res.status(200).json({
       status: 'success',
       data: {
-        post,
+        tag,
       },
     })
   } catch (error) {
@@ -161,18 +132,18 @@ exports.delete = async (req, res) => {
   try {
     const { slug } = req.params
 
-    const post = await Post.findOne({ slug })
+    const tag = await Tag.findOne({ slug })
 
-    if (!post) {
+    if (!tag) {
       res.status(400).json({
         status: 'fail',
         data: {
-          message: 'Post not found !',
+          message: 'Tag not found !',
         },
       })
     }
 
-    await post.remove()
+    await tag.remove()
 
     res.status(204).json({
       status: 'success',
@@ -183,7 +154,7 @@ exports.delete = async (req, res) => {
     res.status(201).json({
       status: 'fail',
       data: {
-        message: 'Error creating post !',
+        message: 'Error deleting tag !',
       },
     })
   }
