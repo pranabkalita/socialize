@@ -1,5 +1,7 @@
 const validator = require('express-validator')
 
+const { filterObj } = require('./../config/request')
+
 const Post = require('./../models/Post')
 const Tag = require('./../models/Tag')
 
@@ -87,10 +89,19 @@ exports.create = async (req, res) => {
       })
     }
 
-    const { title, body } = req.body
-    const { _id } = req.user
+    const filteredObj = filterObj(req.body, 'title', 'body')
+    filteredObj.user = req.user._id
 
-    const post = await Post.create({ user: _id, title, body })
+    if (req.files.coverImage && req.files.coverImage.length > 0) {
+      filteredObj.coverImage = req.files.coverImage[0].filename
+    }
+
+    if (req.files.images && req.files.images.length > 0) {
+      const postImages = req.files.images.map((image) => image.filename)
+      filteredObj.images = postImages
+    }
+
+    const post = await Post.create(filteredObj)
 
     if (typeof req.body.tags !== 'undefined' && req.body.tags.length > 0) {
       await Promise.all(

@@ -8,6 +8,7 @@ const PostValidators = require('./../validators/PostValidators')
 
 // Middlewares
 const AuthMiddleware = require('./../middlewares/AuthMiddleware')
+const PostImageUpload = require('./../middlewares/PostImageUpload')
 
 const router = express.Router()
 
@@ -16,6 +17,7 @@ router.get('/:slug', PostsController.getOne)
 router.post(
   '/',
   AuthMiddleware.protect,
+  PostImageUpload.uploadPostImage,
   PostValidators.create,
   PostsController.create
 )

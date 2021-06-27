@@ -1,6 +1,7 @@
 // Global Imports
 const express = require('express')
 const dotenv = require('dotenv')
+const path = require('path')
 
 dotenv.config({ path: './.env' })
 
@@ -16,7 +17,12 @@ database.connect()
 
 // Fire up server
 const app = express()
+
+// Static file config
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Routes
 app.use('/', viewsRouter)
